@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Баскетбол - Ваш проект</title>
+    <link rel="stylesheet" href="css/basketball-styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300&family=Suez+One&display=swap" rel="stylesheet">
+    <style>
+        /* Основные стили */
+        body {
+            font-family: 'Roboto Slab', serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        #top {
+            width: 100%;
+            background-image: url('img/basketball-court.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            text-align: center;
+            color: white;
+            height: 600px;
+        }
+
+        #main {
+            display: flex;
+            flex-wrap: wrap; 
+            justify-content: space-between; /* Равномерное распределение по горизонтали */
+        }
+
+        #main div {
+            text-align: center;
+            margin: 10px; /* Отступы для карточек игроков */
+            flex: 0 1 calc(30% - 20px); /* Ширина блоков 30% с учетом отступов */
+        }
+
+        #main img {
+            width: 100%; /* Устанавливаем ширину изображений на 100% от родительского блока */
+            margin: 10px 0; /* Отступ сверху и снизу для изображений */
+            transition: transform 0.3s ease; /* Плавный переход для увеличения */
+        }
+
+        #main img:hover {
+            transform: scale(1.1); /* Увеличение изображения на 10% при наведении */
+        }
+
+        /* Стили для всплывающего окна */
+        #popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        #popup {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            max-width: 600px;
+            width: 90%; /* Адаптивная ширина */
+        }
+
+        #popup h2 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        #data-table {
+            width: 100%;
+            margin-top: 10px;
+            border-collapse: collapse;
+        }
+
+        #data-table th, #data-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+            background-color: #ffffff;
+            transition: background-color 0.3s;
+        }
+
+        #data-table th {
+            background-color: #28a745;
+            color: white;
+        }
+
+        #data-table tr:hover td {
+            background-color: #f1f1f1;
+        }
+
+        .btn {
+            margin-top: 15px;
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #218838;
+        }
+
+        .remove-item {
+            cursor: pointer;
+            color: red;
+            font-weight: bold;
+            margin-left: 15px;
+            font-size: 16px;
+        }
+
+        /* Стили для блока преимуществ */
+        .img {
+            text-align: center; /* Центрирование изображений */
+            margin: 20px 0; /* Отступы сверху и снизу */
+        }
+
+        .img img {
+            display: inline-block; /* Позволяет изображениям центрироваться */
+            margin-bottom: 10px; /* Отступ между изображением и текстом */
+        }
+
+        /* Вопросы и ответы */
+        .faq-item {
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            background-color: #fff;
+        }
+
+        .faq-item h3 {
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .faq-item p {
+            display: none;
+            margin: 5px 0 0;
+        }
+
+        .fade-in {
+            opacity: 0;
+            transition: opacity 0.5s ease; /* Плавное появление */
+        }
+
+        .fade-in.show {
+            opacity: 1; /* Делаем элемент видимым */
+        }
+    </style>
+</head>
+<body>
+
+<!-- Шапка сайта -->
+<header class="fixed">
+    <div id="logo">
+        <span>Баскетбол🏀</span>
+    </div>
+    <nav id="about">
+        <a href="#top">Главная</a>
+        <a href="#team">Команда</a>
+        <a href="#overview">Преимущества</a>
+        <a href="#contacts">Контакты</a>
+        <a href="#faq">Вопросы</a>
+        <a href="javascript:void(0);" onclick="showPopup();">Открыть всплывающее окно</a>
+    </nav>
+</header>
+
+<!-- Всплывающее окно -->
+<div id="popup-overlay">
+    <div id="popup">
+        <h2>Данные вашего сообщения</h2>
+        <table id="data-table">
+            <thead>
+                <tr>
+                    <th>Поле</th>
+                    <th>Значение</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                <!-- Данные будут вставлены сюда динамически -->
+            </tbody>
+        </table>
+        <button class="btn" onclick="hidePopup();">Закрыть</button>
+    </div>
+</div>
+
+<!-- Главный блок на сайте -->
+<div id="top">
+    <h1>Добро пожаловать в мир баскетбола!</h1>
+    <h3>Мы объединяем игроков и фанатов</h3>
+</div>
+
+<!-- Информация о команде -->
+<div id="team" class="fade-in">
+    <h2>Наша команда</h2>
+    <div id="main">
+        <div>
+            <h2>Игрок 1</h2>
+            <span>Майк — защитник с отличным видением игры.</span>
+            <img src="img/player1.jpg" alt="Игрок 1">
+        </div>
+        <div>
+            <h2>Игрок 2</h2>
+            <span>Джон — нападающий с невероятной скоростью.</span>
+            <img src="img/player2.jpg" alt="Игрок 2">
+        </div>
+        <div>
+            <h2>Игрок 3</h2>
+            <span>Эмили — центровой, обладающий отличной физической подготовкой.</span>
+            <img src="img/player3.jpg" alt="Игрок 3">
+        </div>
+    </div>
+</div>
+
+<!-- Блок с преимуществами -->
+<div id="overview" class="fade-in">
+    <h2>Почему выбирают нас?</h2>
+    <h4>Лучшие тренеры и игроки</h4>
+    <div class="img">
+        <img src="img/training.jpg" alt="Тренировка команды" style="width: 48%;">
+        <span>Качество тренировок на высшем уровне</span>
+    </div>
+    <div class="img">
+        <img src="img/fans.jpg" alt="Фанаты команды" style="width: 48%;">
+        <span>Невероятная поддержка наших фанатов</span>
+    </div>
+</div>
+
+<!-- Блок с контактами -->
+<div id="contacts" class="fade-in">
+    <h2>Свяжитесь с нами</h2>
+    <div class="contact-info">
+        <h5>Наши контакты:</h5>
+        <p><strong>Адрес:</strong> ул. Баскетбольная, д. 10, Москва, Россия</p>
+        <p><strong>Телефон:</strong> +7 (495) 123-45-67</p>
+        <p><strong>Email:</strong> info@basketball.ru</p>
+    </div>
+    <form id="form_input">
+        <label for="name">Ваше имя <span>*</span></label>
+        <input type="text" id="name" required>
+        
+        <label for="email">Ваш Email <span>*</span></label>
+        <input type="email" id="email" required>
+        
+        <label for="message">Сообщение</label><br>
+        <textarea id="message" rows="4" required></textarea>
+        
+        <button type="submit" class="btn">Отправить</button>
+    </form>
+</div>
+
+<!-- Вопросы и ответы -->
+<div id="faq" class="fade-in">
+    <h2>Вопросы и ответы</h2>
+    <div class="faq-item">
+        <h3>Как можно присоединиться к команде?</h3>
+        <p style="display:none;">Присоединиться можно на пробных тренировках. Следите за обновлениями на сайте для новых мероприятий.</p>
+    </div>
+    <div class="faq-item">
+        <h3>Какие тренировки у вас есть?</h3>
+        <p style="display:none;">Мы проводим тренировки для всех уровней. От новичков до профессионалов.</p>
+    </div>
+    <div class="faq-item">
+        <h3>Каковы условия участия в тренировках?</h3>
+        <p style="display:none;">Участие возможно при соблюдении всех необходимых рекомендаций тренера и наличии специальной экипировки.</p>
+    </div>
+    <div class="faq-item">
+        <h3>Когда проходят тренировки?</h3>
+        <p style="display:none;">Тренировки проходят по расписанию, которое можно найти на нашем сайте.</p>
+    </div>
+</div>
+
+<script>
+    const popupOverlay = document.getElementById("popup-overlay");
+    const popup = document.getElementById("popup");
+    const form = document.getElementById("form_input");
+    const tableBody = document.getElementById("table-body");
+
+    function showPopup() {
+        const existingData = JSON.parse(localStorage.getItem("messages") || "[]");
+        tableBody.innerHTML = ""; // Очищаем таблицу перед заполнением новыми данными
+
+        existingData.forEach((data, index) => {
+            const newRow = `
+                <tr>
+                    <td>Имя</td>
+                    <td>${data.name} <span class="remove-item" onclick="removeItem(${index});">✖</span></td>
+                </tr>
+                <tr>
+                    <td>Email</td>
+                    <td>${data.email} <span class="remove-item" onclick="removeItem(${index});">✖</span></td>
+                </tr>
+                <tr>
+                    <td>Сообщение</td>
+                    <td>${data.message} <span class="remove-item" onclick="removeItem(${index});">✖</span></td>
+                </tr>
+            `;
+            tableBody.innerHTML += newRow; // Заполняем таблицу данными
+        });
+
+        popupOverlay.style.display = "block"; // Показываем всплывающее окно
+    }
+
+    function hidePopup() {
+        popupOverlay.style.display = "none"; // Скрываем всплывающее окно
+    }
+
+    function removeItem(index) {
+        const existingData = JSON.parse(localStorage.getItem("messages") || "[]");
+        existingData.splice(index, 1); // Удаляем элемент по индексу
+        localStorage.setItem("messages", JSON.stringify(existingData)); // Сохраняем обновленные данные
+        showPopup(); // Обновляем всплывающее окно
+    }
+
+    // Обработчик отправки формы
+    form.addEventListener("submit", function(event) {
+        event.preventDefault(); // Предотвращаем отправку формы
+        const name = document.getElementById("name").value;
+        const email = document.getElementById("email").value;
+        const message = document.getElementById("message").value;
+
+        // Проверка на дублирование данных
+        const existingData = JSON.parse(localStorage.getItem("messages") || "[]");
+        const isDuplicate = existingData.some(data => data.name === name && data.email === email && data.message === message);
+
+        if (!isDuplicate) {
+            // Сохраняем данные в локальном хранилище  
+            existingData.push({name, email, message});
+            localStorage.setItem("messages", JSON.stringify(existingData));
+
+            // Показываем всплывающее окно
+            showPopup();
+            form.reset(); // Очищаем форму
+        } else {
+            alert("Эти данные уже были отправлены!");
+        }
+    });
+
+    // Добавляем плавный переход к секциям
+    const navLinks = document.querySelectorAll('nav a');
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault(); // Прекращаем стандартное поведение
+            const targetId = this.getAttribute('href'); // Получаем атрибут href
+            const targetElement = document.querySelector(targetId); // Находим целевой элемент
+            targetElement.scrollIntoView({ behavior: 'smooth' }); // Прокручиваем к элементу
+        });
+    });
+
+    // Получаем ссылки на все элементы вопросов
+    const faqItems = document.querySelectorAll('.faq-item h3');
+
+    faqItems.forEach(item => {
+        item.addEventListener('click', function() {
+            const answer = this.nextElementSibling; // Получаем следующий элемент (ответ)
+            // Переключаем видимость ответа
+            if (answer.style.display === 'block') {
+                answer.style.display = 'none'; // Скрываем, если он уже виден
+            } else {
+                answer.style.display = 'block'; // Показываем ответ
+            }
+        });
+    });
+
+    // Анимация при прокрутке
+    const fadeInSections = document.querySelectorAll('.fade-in');
+
+    window.addEventListener('scroll', () => {
+        fadeInSections.forEach(section => {
+            const rect = section.getBoundingClientRect();
+            const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+
+            if (isVisible) {
+                section.classList.add('show'); // Добавляем класс show, если элемент видим
+            }
+        });
+    });
+
+    popupOverlay.addEventListener("click", hidePopup); // Закрытие всплывающего окна при клике на оверлей
+    popup.addEventListener("click", (event) => event.stopPropagation()); // Предотвращение закрытия при клике внутри окна
+</script>
+
+</body>
+</html>
